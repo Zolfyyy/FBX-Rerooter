@@ -53,3 +53,8 @@ install(
         PATTERN "*.h"
         PATTERN "*.hpp"
 )
+
+install(
+    FILES       THIRDPARTYNOTICES.txt
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
+)
