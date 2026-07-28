@@ -1,12 +1,23 @@
 <img src="./banner.png" align="center"/>
 <h1 align="center">FBX Rerooter</h1>
-<p align="center">A command-line utility for re-rooting skeletons in FBX files using the Autodesk FBX SDK.</p>
+<p align="center">A simple tool for re-rooting your FBX skeletons.</p>
 
-## Why It Exists
+## Why This Exists
 
-When exporting models or animations from Unity Editor, the FBX exporter often excludes root motion bones of a skeleton from the bone hierarchy itself since the root motion bone _usually_ doesn't carry any weights to any skinned mesh renderers. This makes it problematic when exporting skeletons or animations with root motion, often having to reconstruct the root motion bone in an external program like Blender and transferring the root motion into it.
+When exporting models or animations from the Unity Editor, the FBX Exporter often excludes root motion bones of a skeleton from the bone hierarchy itself since the root motion bone usually doesn't carry any weights to any skinned meshes. The test file, `test/Skeleton.fbx`, demonstrates this hierarchy:
 
-To solve this, this tool inspects the FBX skeleton hierarchy and can promote any parent node to a Skeleton root node.
+```
+Skeleton (Null)
+└─ Root (Null)
+   └─ Hips (LimbNode)
+      └─ Spine (LimbNode)
+         └─ Chest (LimbNode)
+            └─ Neck (LimbNode)
+```
+
+The skeleton starts at `Hips`, not `Root`. `Root` is excluded from the skeleton, which should not be the case. If you want to retain the root motion (especially for retargeting purposes), you'll have to reconstruct the root motion bone within the skeleton and transfer the motion from the parent node.
+
+To solve this, this tool inspects the FBX skeleton hierarchy and can promote any null node to a skeleton root node.
 
 ## Usage
 
@@ -14,13 +25,11 @@ To solve this, this tool inspects the FBX skeleton hierarchy and can promote any
 fbx-reroot [OPTIONS] SUBCOMMAND
 ```
 
-All examples below use the test file `test/Skeleton.fbx` which ships with the repository.
-
----
+All examples below use the test file `test/Skeleton.fbx`.
 
 ### `find`
 
-Lists all nodes in the FBX file that carry a `Skeleton` attribute of type `Root`.
+Lists all skeleton roots in the FBX file.
 
 ```bash
 fbx-reroot find test/Skeleton.fbx
@@ -31,7 +40,7 @@ fbx-reroot find test/Skeleton.fbx
 Hips
 ```
 
-Use `--tree` to show the full ancestor path from the scene root to each skeleton root node (comma-separated):
+You can also use the `-t,--tree` option to show the full ancestor path of each skeleton root node (comma-separated):
 
 ```bash
 fbx-reroot find -t test/Skeleton.fbx
@@ -42,21 +51,23 @@ fbx-reroot find -t test/Skeleton.fbx
 Skeleton,Root,Hips
 ```
 
-This tells us `Hips` is the current skeleton root, and its full hierarchy is `Skeleton → Root → Hips`.
+This shows that `Hips` is the current skeleton root.
 
 ---
 
 ### `make-root`
 
-Promotes a node to a `Skeleton` root. Two modes are available.
+Promotes a null node to a skeleton root. Two modes are available.
 
-#### Mode A: Promote a specific node (`--to-node`)
+#### Promote a specific node (`--to-node`)
 
-Promote a named node to skeleton root, optionally demoting an existing child skeleton root to a limb:
+Use the `--to-node` option to specify which null node should become a skeleton root.
 
 ```bash
-fbx-reroot make-root test/Skeleton.fbx --to-node Root --from-node Hips -o test/Skeleton_rerooted.fbx -y
+fbx-reroot make-root test/Skeleton.fbx --to-node Root -o test/Skeleton_rerooted.fbx
 ```
+
+Optionally, you can use the `--from-node` option to specify an existing root to "move" the root from. 
 
 **Output:**
 ```
@@ -75,9 +86,9 @@ fbx-reroot find -t test/Skeleton_rerooted.fbx
 Skeleton,Root
 ```
 
-`Root` is now the skeleton root, and `Hips` was demoted to a limb node. (The `-y` flag skips the overwrite prompt.)
+`Root` is now the new skeleton root.
 
-#### Mode B: Walk up from an existing root (`--from-node` + `--to-parent`)
+#### Walk up from an existing root (`--from-node` + `--to-parent`)
 
 Walk up `N` levels from an existing skeleton root and make that ancestor the new root:
 
@@ -94,11 +105,6 @@ Given the hierarchy `Skeleton,Root,Hips`, walking up 1 level from `Hips` reaches
 | `-o, --output <path>` | Output FBX file path (default: `<input>` in CWD)              |
 | `-f, --format <fmt>`  | Output format: `auto`, `ascii`, or `binary` (default: `auto`) |
 | `-y, --yes`           | Skip the overwrite confirmation prompt                        |
-
-**Output format notes:**
-- `auto` - matches the input file's format (binary or ASCII).
-- `ascii` - forces ASCII FBX (human-readable, larger files).
-- `binary` - forces binary FBX (smaller, faster to load).
 
 ## Building
 
