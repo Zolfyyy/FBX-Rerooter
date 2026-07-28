@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
 
 permissions:
+  actions: write
   contents: write
   issues: write
   pull-requests: write
@@ -15,6 +16,8 @@ jobs:
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -43,14 +46,17 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: ${{ runner.temp }}/artifacts/${{ matrix.artifact }}
+          skip-decompress: true
 
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ${{ runner.temp }}/artifacts/${{ matrix.artifact }}
-        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" ./* --clobber
+        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" ./* --clobber --repo "$GITHUB_REPOSITORY"
 
       - name: Delete workflow artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/github-script@v9
         with:
           script: |
