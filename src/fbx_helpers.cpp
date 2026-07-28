@@ -24,4 +24,13 @@ namespace fbx_helpers
         for (int i = 0; i < child_count; ++i)
             find_skeleton_roots(node->GetChild(i), results);
     }
+
+    bool is_null_type(fbxsdk::FbxNode *node)
+    {
+        if (!node)
+            return false;
+
+        fbxsdk::FbxNodeAttribute *attr = node->GetNodeAttribute();
+        return !attr || node->GetNull() != nullptr;
+    }
 } // namespace fbx_helpers

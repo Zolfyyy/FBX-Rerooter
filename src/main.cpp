@@ -40,6 +40,42 @@ static bool ancestor_is_skeleton_root(fbxsdk::FbxNode *node)
     return false;
 }
 
+static void convert_child_nulls_to_limbs(fbxsdk::FbxNode *node)
+{
+    if (!node)
+        return;
+
+    int child_count = node->GetChildCount();
+    for (int i = 0; i < child_count; ++i)
+    {
+        fbxsdk::FbxNode *child = node->GetChild(i);
+
+        // If this child is already a Skeleton root, convert it but don't recurse
+        fbxsdk::FbxSkeleton *skel = child->GetSkeleton();
+        if (skel && skel->IsSkeletonRoot())
+        {
+            skel->SetSkeletonType(fbxsdk::FbxSkeleton::eLimbNode);
+            continue;
+        }
+
+        if (fbx_helpers::is_null_type(child))
+        {
+            if (!skel)
+            {
+                skel = fbxsdk::FbxSkeleton::Create(
+                    child->GetScene()->GetFbxManager(),
+                    child->GetName());
+                fbxsdk::FbxNodeAttribute *old_attr = child->SetNodeAttribute(skel);
+                if (old_attr)
+                    old_attr->Destroy();
+            }
+            skel->SetSkeletonType(fbxsdk::FbxSkeleton::eLimbNode);
+        }
+
+        convert_child_nulls_to_limbs(child);
+    }
+}
+
 static int run_find_command(const std::string &input_file, bool print_tree)
 {
     fbxsdk::FbxManager *sdk_manager = fbxsdk::FbxManager::Create();
@@ -244,20 +280,7 @@ static int run_make_root_command(const std::string &input_file, const std::strin
 
     skeleton_attr->SetSkeletonType(fbxsdk::FbxSkeleton::eLimbNode);
 
-    if (from_node_ptr)
-    {
-        ensure_skeleton_limb_hierarchy(from_node_ptr, target);
-    }
-    else
-    {
-        std::vector<fbxsdk::FbxNode *> child_roots;
-        fbx_helpers::find_skeleton_roots(target, child_roots);
-
-        for (auto *child_root : child_roots)
-        {
-            ensure_skeleton_limb_hierarchy(child_root, target);
-        }
-    }
+    convert_child_nulls_to_limbs(target);
 
     std::cout << "Converted '" << target->GetName() << "' to a Skeleton root node.\n";
 
