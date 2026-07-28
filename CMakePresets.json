@@ -1,36 +1,17 @@
 {
-    "version": 6,
+    "version": 7,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 20,
+        "minor": 27,
         "patch": 0
     },
     "configurePresets": [
-        {
-            "name": "win-x86",
-            "displayName": "Windows x86 (MSVC)",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x86",
-            "binaryDir": "${sourceDir}/build/win-x86",
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "cl.exe"
-            }
-        },
-        {
-            "name": "default",
-            "displayName": "Windows x64 (MSVC) [default]",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/build/win-x64",
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "cl.exe"
-            }
-        },
         {
             "name": "win-x64",
             "displayName": "Windows x64 (MSVC)",
             "generator": "Visual Studio 17 2022",
             "architecture": "x64",
+            "toolset": "host=x64",
             "binaryDir": "${sourceDir}/build/win-x64",
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "cl.exe"
@@ -38,23 +19,19 @@
         },
         {
             "name": "linux-x64",
-            "displayName": "Linux x64 (GCC)",
+            "displayName": "Linux x64 (Clang)",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/linux-x64",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "g++"
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_FLAGS": "-m64",
+                "CMAKE_CXX_FLAGS": "-m64"
             }
         }
     ],
     "buildPresets": [
-        {
-            "name": "default",
-            "configurePreset": "default"
-        },
-        {
-            "name": "win-x86",
-            "configurePreset": "win-x86"
-        },
         {
             "name": "win-x64",
             "configurePreset": "win-x64"

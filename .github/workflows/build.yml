@@ -1,0 +1,110 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: "If set, upload the built binary as a workflow artifact with this name"
+        type: string
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: "If set, upload the built binary as a workflow artifact with this name"
+        type: string
+        required: false
+        default: ""
+
+env:
+  FBX_SDK_VERSION: "202039"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest, windows-2022]
+        build_type: [Release]
+        c_compiler: [clang, cl]
+        include:
+          - os: windows-2022
+            c_compiler: cl
+            cpp_compiler: cl
+            cmake_preset: win-x64
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            cmake_preset: linux-x64
+        exclude:
+          - os: windows-2022
+            c_compiler: clang
+          - os: ubuntu-latest
+            c_compiler: cl
+
+    steps:
+    - uses: actions/checkout@v7
+      with: 
+        submodules: recursive
+
+    - uses: microsoft/setup-msbuild@v3
+      if: runner.os == 'Windows'
+
+    - name: Set FBX SDK path
+      id: fbx-path
+      shell: bash
+      run: echo "fbx-sdk-dir=${{ github.workspace }}/.fbx-sdk" >> "$GITHUB_OUTPUT"
+
+    - name: Cache FBX SDK
+      id: cache-fbx
+      uses: actions/cache@v6
+      with:
+        path: ${{ steps.fbx-path.outputs.fbx-sdk-dir }}
+        key: fbx-sdk-${{ matrix.os }}-${{ env.FBX_SDK_VERSION }}
+
+    - name: Download and install FBX SDK (Windows)
+      if: runner.os == 'Windows' && steps.cache-fbx.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        choco install 7zip
+        curl -L "https://damassets.autodesk.net/content/dam/autodesk/www/files/fbx${{ env.FBX_SDK_VERSION }}_fbxsdk_vs2022_win.exe" -o "${{ runner.temp }}/fbxsdk_installer.exe"
+        mkdir -p ${{ steps.fbx-path.outputs.fbx-sdk-dir }}
+        7z x -o${{ steps.fbx-path.outputs.fbx-sdk-dir }} "${{ runner.temp }}/fbxsdk_installer.exe"
+        Get-ChildItem -Path $target -Recurse | Select-Object FullName
+
+    - name: Download and install FBX SDK (Linux)
+      if: runner.os == 'Linux' && steps.cache-fbx.outputs.cache-hit != 'true'
+      run: |
+        curl -L --retry 5 "https://damassets.autodesk.net/content/dam/autodesk/www/files/fbx${{ env.FBX_SDK_VERSION }}_fbxsdk_gcc_linux.tar.gz" -o "${{ runner.temp }}/fbx_sdk.tar.gz"
+        mkdir -p "${{ runner.temp }}/fbxsdk_installer"
+        tar -xzf "${{ runner.temp }}/fbx_sdk.tar.gz" -C "${{ runner.temp }}/fbxsdk_installer"
+        installer=$(find "${{ runner.temp }}/fbxsdk_installer" -type f -executable | head -1)
+        chmod +x "$installer"
+        mkdir -p "${{ steps.fbx-path.outputs.fbx-sdk-dir }}"
+        printf "yes\nn\n" | "$installer" "${{ steps.fbx-path.outputs.fbx-sdk-dir }}"
+        ls -R "${{ steps.fbx-path.outputs.fbx-sdk-dir }}"
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.cmake_preset }} -DFBX_DIR="${{ steps.fbx-path.outputs.fbx-sdk-dir }}"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.cmake_preset }} --config ${{ matrix.build_type }}
+
+    - name: Install
+      if: inputs.artifact_name != ''
+      run: |
+        cmake --install "build/${{ matrix.cmake_preset }}" --config ${{ matrix.build_type }} --prefix "${{ runner.temp }}/install"
+
+    - name: Upload artifact
+      if: inputs.artifact_name != ''
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact_name }}-${{ runner.os }}-${{ matrix.build_type }}
+        path: ${{ runner.temp }}/install/**

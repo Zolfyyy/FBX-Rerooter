@@ -4,7 +4,7 @@ set(SOURCES
 )
 
 set(PUBLIC_HEADERS
-    # Add public headers here as they are created
+    # Public headers
 )
 
 add_executable(${PROJECT_NAME}
@@ -25,17 +25,14 @@ if(WIN32)
 endif()
 
 if(UNIX AND NOT APPLE)
-    # Linux-specific settings
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     PROJECT_VERSION="${PROJECT_VERSION}"
 )
 
-# ── Link dependencies ─────────────────────────────────────────────────────────
-target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11 FBX::SDK)
+target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11 fbx::sdk)
 
-# ── Install target ───────────────────────────────────────────────────────────
 install(
     TARGETS     ${PROJECT_NAME}
     EXPORT      ${PROJECT_NAME}Targets

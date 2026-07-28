@@ -105,14 +105,21 @@ Given the hierarchy `Skeleton,Root,Hips`, walking up 1 level from `Hips` reaches
 ### Prerequisites
 
 - CMake 3.20+
-- C++20 compiler (MSVC, Clang, GCC)
+- C++20 compiler (MSVC, Clang)
 - [Autodesk FBX SDK](https://aps.autodesk.com/developer/overview/fbx-sdk) (2020.3.x or later)
 
 ### Configure & build
 
 ```bash
-cmake -B build -DFBX_SDK_DIR="C:/Program Files/Autodesk/FBX/FBX SDK/2020.3.9"
-cmake --build build
+# Windows (MSVC, x64)
+cmake --preset win-x64 -DFBX_SDK_DIR="C:/Program Files/Autodesk/FBX/FBX SDK/2020.3.9"
+# Debug or Release build
+cmake --build --preset win-x64 --config Debug
+cmake --build --preset win-x64 --config Release
+
+# Linux (Clang, x64)
+cmake --preset linux-x64 -DFBX_SDK_DIR="/opt/fbx-sdk"
+cmake --build --preset linux-x64
 ```
 
 ## License
