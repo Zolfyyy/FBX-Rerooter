@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.27)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" _VERSION_RAW)
+string(STRIP "${_VERSION_RAW}" _VERSION)
+
 project(fbx-reroot
-    VERSION     1.0.0
+    VERSION     ${_VERSION}
     DESCRIPTION "FBX armature re-rooting utility"
     LANGUAGES   CXX
 )
