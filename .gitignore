@@ -1,0 +1,99 @@
+# ==============================================================================
+# CMake Build Artifacts and Cache
+# ==============================================================================
+# Ignore the entire standard build output directories
+/[Bb]uild/
+/build*/
+/out/
+
+# In-source build file leftovers (if cmake is run in the root by accident)
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Ignore local user presets, but keep CMakePresets.json tracked if you use it
+CMakeUserPresets.json
+
+# ==============================================================================
+# C++ / Compiler Compiled Outputs
+# ==============================================================================
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.o
+*.obj
+*.ko
+*.obj
+*.elf
+
+# Linker Files
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# ==============================================================================
+# IDEs and Text Editors
+# ==============================================================================
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+.cache/
+
+# Visual Studio (MSVC)
+.vs/
+AppPackages/
+BundleArtifacts/
+VisualStudioWorkspaceData/
+
+# CLion / JetBrains
+.idea/
+cmake-build-*/
+
+# Qt Creator
+*.CMakeLists.txt.user
+*.user
+*.user.*
+
+# Xcode
+.XCode/
+*.xcworkspace
+*.xcuserdata
+
+# Backup and swap files
+*.swp
+*~
+
+# ==============================================================================
+# Operating System Files
+# ==============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
