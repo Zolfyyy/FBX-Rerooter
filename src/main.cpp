@@ -76,6 +76,22 @@ static void convert_child_nulls_to_limbs(fbxsdk::FbxNode *node)
     }
 }
 
+static void find_skeleton_roots(fbxsdk::FbxNode *node,
+                                std::vector<fbxsdk::FbxNode *> &results)
+{
+    if (!node)
+        return;
+
+    if (node->GetSkeleton() && node->GetSkeleton()->IsSkeletonRoot())
+    {
+        results.push_back(node);
+    }
+
+    int child_count = node->GetChildCount();
+    for (int i = 0; i < child_count; ++i)
+        find_skeleton_roots(node->GetChild(i), results);
+}
+
 static int run_find_command(const std::string &input_file, bool print_tree)
 {
     fbxsdk::FbxManager *sdk_manager = fbxsdk::FbxManager::Create();
@@ -111,7 +127,7 @@ static int run_find_command(const std::string &input_file, bool print_tree)
     importer->Destroy();
 
     std::vector<fbxsdk::FbxNode *> root_bones;
-    fbx_helpers::find_skeleton_roots(scene->GetRootNode(), root_bones);
+    find_skeleton_roots(scene->GetRootNode(), root_bones);
 
     for (auto *node : root_bones)
     {
@@ -164,14 +180,18 @@ static int run_make_root_command(const std::string &input_file, const std::strin
     }
 
     // Set format
-    bool ascii = format == "ascii";
+    bool ascii;
     if (format == "ascii")
     {
         ascii = true;
     }
     else if (format == "auto")
     {
-        ascii = importer->GetFileFormat() == 1;
+        ascii = fbx_helpers::get_ascii_reader_index(sdk_manager->GetIOPluginRegistry()) == importer->GetFileFormat();
+    }
+    else
+    {
+        ascii = false;
     }
 
     fbxsdk::FbxScene *scene = fbxsdk::FbxScene::Create(sdk_manager, "");
@@ -286,7 +306,7 @@ static int run_make_root_command(const std::string &input_file, const std::strin
 
     fbxsdk::FbxExporter *exporter = fbxsdk::FbxExporter::Create(sdk_manager, "");
 
-    if (!exporter->Initialize(output_file.c_str(), ascii ? 1 : 0, ios))
+    if (!exporter->Initialize(output_file.c_str(), ascii ? fbx_helpers::get_ascii_writer_index(sdk_manager->GetIOPluginRegistry()) : fbx_helpers::get_binary_writer_index(sdk_manager->GetIOPluginRegistry()), ios))
     {
         std::cerr << "Fatal: could not initialize exporter for '" << output_file << "': "
                   << exporter->GetStatus().GetErrorString() << '\n';

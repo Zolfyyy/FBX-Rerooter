@@ -2,11 +2,7 @@
 
 #include <string>
 #include <vector>
-
-namespace fbxsdk
-{
-    class FbxNode;
-}
+#include <fbxsdk.h>
 
 namespace fbx_helpers
 {
@@ -16,8 +12,13 @@ namespace fbx_helpers
     /// Check whether a node is a Null type (no attribute or attribute is Null).
     bool is_null_type(fbxsdk::FbxNode *node);
 
-    /// Recursively collect all Skeleton root nodes under \a node.
-    void find_skeleton_roots(fbxsdk::FbxNode *node,
-                             std::vector<fbxsdk::FbxNode *> &results);
+    /// Get the reader format index for ASCII FBX, or -1 if not found.
+    int get_ascii_reader_index(const fbxsdk::FbxIOPluginRegistry *registry);
+
+    /// Get the writer format index for ASCII FBX, or -1 if not found.
+    int get_ascii_writer_index(const fbxsdk::FbxIOPluginRegistry *registry);
+
+    /// Get the writer format index for binary FBX, or -1 if not found.
+    int get_binary_writer_index(const fbxsdk::FbxIOPluginRegistry *registry);
 
 } // namespace fbx_helpers
