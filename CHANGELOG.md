@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/Zolfyyy/FBX-Rerooter/compare/v1.2.1...v1.3.0) (2026-07-31)
+
+
+### Features
+
+* replace version subcommand with --version flag ([8c56a83](https://github.com/Zolfyyy/FBX-Rerooter/commit/8c56a8370a26c4f88afa641ed2498bb0fd4db571))
+
+
+### Bug Fixes
+
+* ensure CMake reconfigures on version.txt changes ([b157800](https://github.com/Zolfyyy/FBX-Rerooter/commit/b157800bb1d0209bc9b67d330c3da4139d714039))
+
 ## [1.2.1](https://github.com/Zolfyyy/FBX-Rerooter/compare/v1.2.0...v1.2.1) (2026-07-31)
 
 
