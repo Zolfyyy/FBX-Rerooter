@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/version.txt")
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" _VERSION_RAW)
 string(STRIP "${_VERSION_RAW}" _VERSION)
 
