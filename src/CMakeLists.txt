@@ -33,6 +33,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE CLI11::CLI11 fbx::sdk)
 
+if(MSVC)
+    # Suppress LNK4099 (PDB not found with library) from the FBX SDK static lib
+    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
+endif()
+
 install(
     TARGETS     ${PROJECT_NAME}
     EXPORT      ${PROJECT_NAME}Targets
