@@ -350,7 +350,7 @@ int main(int argc, char **argv)
         ->check(CLI::ExistingFile);
     find_command->add_flag("-t,--tree", opt_tree, "Show the full ancestor path from root to the node itself");
 
-    auto *version_command = app.add_subcommand("version", "Display the program version");
+    app.set_version_flag("--version", PROJECT_VERSION, "Display the program version");
 
     auto *mkroot_command = app.add_subcommand("make-root", "Convert a node into a Skeleton root node");
     mkroot_command->add_option("input", opt_input_file, "Input FBX file")
@@ -382,12 +382,7 @@ int main(int argc, char **argv)
 
     CLI11_PARSE(app, argc, argv);
 
-    if (app.got_subcommand(version_command))
-    {
-        std::cout << PROJECT_VERSION << '\n';
-        return EXIT_SUCCESS;
-    }
-    else if (app.got_subcommand(find_command))
+    if (app.got_subcommand(find_command))
     {
         return run_find_command(opt_input_file, opt_tree);
     }
