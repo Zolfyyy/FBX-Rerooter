@@ -53,6 +53,41 @@ Skeleton,Root,Hips
 
 This shows that `Hips` is the current skeleton root.
 
+### `get`
+
+Looks up a node by its full comma-separated hierarchy path and prints the matching path. The command exits with status `0` when the node is found and `1` when it is not found (or the FBX file cannot be read).
+
+```bash
+fbx-reroot get test/Skeleton.fbx Skeleton,Root,Hips
+```
+
+**Output:**
+```
+Skeleton,Root,Hips
+```
+
+### `create`
+
+Creates a Null node at a comma-separated hierarchy path when it does not already exist. By default, all parent nodes must already be present; use `-p` to create any missing parent nodes along the path. If the target node exists, the command exits successfully without writing an output file.
+
+```bash
+fbx-reroot create test/Skeleton.fbx Skeleton,Root -o test/Skeleton_with_root.fbx
+```
+
+Create a target with missing ancestors:
+
+```bash
+fbx-reroot create test/Skeleton.fbx Character,Motion,Root -p -o test/Skeleton_with_root.fbx
+```
+
+The created Null node can then be promoted with `make-root`:
+
+```bash
+fbx-reroot make-root test/Skeleton_with_root.fbx --to-node Root -o test/Skeleton_rerooted.fbx
+```
+
+`create` also supports the `-f, --format` and `-y, --yes` options described below for `make-root`.
+
 ---
 
 ### `make-root`

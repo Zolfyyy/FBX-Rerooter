@@ -1,11 +1,23 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <fbxsdk.h>
 
 namespace fbx_helpers
 {
+    struct FbxManagerDeleter
+    {
+        void operator()(fbxsdk::FbxManager *manager) const
+        {
+            if (manager)
+                manager->Destroy();
+        }
+    };
+
+    using FbxManagerPtr = std::unique_ptr<fbxsdk::FbxManager, FbxManagerDeleter>;
+
     /// Check whether a node is a Skeleton root.
     bool is_skeleton_root(fbxsdk::FbxNode *node);
 
