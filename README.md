@@ -66,6 +66,26 @@ fbx-reroot get test/Skeleton.fbx Skeleton,Root,Hips
 Skeleton,Root,Hips
 ```
 
+### `move`
+
+Moves an existing node to a full destination hierarchy path. The destination parent must already exist. The final path component is the node's name after the move; local transforms are kept unchanged.
+
+```bash
+fbx-reroot move test/Skeleton.fbx Skeleton,Root,Hips Skeleton,Motion,Hips -o test/Skeleton_moved.fbx
+```
+
+The command fails if the source or destination parent is not found, if the move would create a hierarchy cycle, or if another node already has the destination name under that parent. A node can also be renamed as part of the move by using a different final component.
+
+### `extract-motion`
+
+Extracts selected root motion from a node and applies it to its immediate parent. Use `-t, --translation` with any combination of `x`, `y`, and `z` to select translation axes, and `-r, --rotation` with the axis perpendicular to the ground plane to extract projected rotation (for example, `y` for a Y-up scene). Either or both options can be specified.
+
+```bash
+fbx-reroot extract-motion test/Skeleton.fbx Skeleton,Root,Hips --translation xz --rotation y -o test/Skeleton_motion.fbx
+```
+
+Animation stacks with multiple layers are baked to a sampled base layer before extraction. Animated transforms are sampled at the scene frame rate over the stack's time range. Without animation stacks, the selected components are extracted from the node's default transform.
+
 ### `create`
 
 Creates a Null node at a comma-separated hierarchy path when it does not already exist. By default, all parent nodes must already be present; use `-p` to create any missing parent nodes along the path. If the target node exists, the command exits successfully without writing an output file.

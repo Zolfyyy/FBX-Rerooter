@@ -3,6 +3,24 @@
 
 namespace fbx_helpers
 {
+    fbxsdk::FbxQuaternion rotation_to_quaternion(const fbxsdk::FbxVector4 &rotation,
+                                                 fbxsdk::EFbxRotationOrder order)
+    {
+        fbxsdk::FbxAMatrix matrix;
+        matrix.SetR(rotation, static_cast<int>(order));
+        fbxsdk::FbxQuaternion quaternion = matrix.GetQ();
+        quaternion.Normalize();
+        return quaternion;
+    }
+
+    fbxsdk::FbxVector4 quaternion_to_rotation(const fbxsdk::FbxQuaternion &quaternion,
+                                              fbxsdk::EFbxRotationOrder order)
+    {
+        fbxsdk::FbxAMatrix matrix;
+        matrix.SetQ(quaternion);
+        return matrix.GetR(static_cast<int>(order));
+    }
+
     bool is_skeleton_root(fbxsdk::FbxNode *node)
     {
         fbxsdk::FbxSkeleton *skeleton = node->GetSkeleton();

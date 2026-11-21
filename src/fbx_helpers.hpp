@@ -18,6 +18,14 @@ namespace fbx_helpers
 
     using FbxManagerPtr = std::unique_ptr<fbxsdk::FbxManager, FbxManagerDeleter>;
 
+    /// Convert Euler rotation angles to a normalized quaternion using the specified rotation order.
+    fbxsdk::FbxQuaternion rotation_to_quaternion(const fbxsdk::FbxVector4 &rotation,
+                                                 fbxsdk::EFbxRotationOrder order);
+
+    /// Convert a quaternion to Euler rotation angles using the specified rotation order.
+    fbxsdk::FbxVector4 quaternion_to_rotation(const fbxsdk::FbxQuaternion &quaternion,
+                                              fbxsdk::EFbxRotationOrder order);
+
     /// Check whether a node is a Skeleton root.
     bool is_skeleton_root(fbxsdk::FbxNode *node);
 

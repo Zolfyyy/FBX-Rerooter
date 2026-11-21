@@ -1,5 +1,12 @@
 set(SOURCES
     main.cpp
+    command_helpers.cpp
+    cmd_find.cpp
+    cmd_get.cpp
+    cmd_create.cpp
+    cmd_move.cpp
+    cmd_extract_motion.cpp
+    cmd_make_root.cpp
     fbx_helpers.cpp
 )
 
