@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/Zolfyyy/FBX-Rerooter/compare/v1.3.0...v1.4.0) (2026-11-21)
+
+
+### Features
+
+* add `get` and `create` commands ([5ffd239](https://github.com/Zolfyyy/FBX-Rerooter/commit/5ffd239dae985e56c9004d1be72d29e73df0b2ff))
+* add `move` and `extract-motion` commands ([b8a9433](https://github.com/Zolfyyy/FBX-Rerooter/commit/b8a943309c26bb956adf4fc2fc42a73a5e1e8f63))
+
 ## [1.3.0](https://github.com/Zolfyyy/FBX-Rerooter/compare/v1.2.1...v1.3.0) (2026-07-31)
 
 
